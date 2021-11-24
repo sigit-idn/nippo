@@ -4,79 +4,149 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="tailwind.min.css">
+    <link rel="stylesheet" href="tailwind.min.css" />
     <title>新しいタブ</title>
-    <style>
-      
-      * {
-        background-color: #000;
-        color: #888;
-      }
-    </style>
   </head>
-  <body>
-    <form>
-      <textarea onchange="setOption(this.value)"></textarea><br>
-      <select onchange="addReport('select')">
-      <option value=""></option>
+  <body
+    class="
+      px-3
+      py-12
+      text-gray-300
+      bg-black
+      flex flex-col
+      w-screen
+      h-screen
+      font-light
+      content-center
+      items-center
+      container
+      relative
+    "
+  >
+    <form class="w-full max-w-xl">
+      <textarea
+        class="
+          w-full
+          rounded-md
+          bg-gray-800
+          shadow-inner
+          px-3
+          py-1
+          focus:outline-none focus:ring-indigo-600 focus:ring-1
+        "
+        placeholder="Tasks"
+        onchange="setOption(this.value)"
+      ></textarea>
+
+      <input
+        class="
+          block
+          mb-1
+          w-full
+          px-3
+          py-1
+          rounded-md
+          bg-gray-800
+          shadow-inner
+          focus:outline-none focus:ring-indigo-600 focus:ring-1
+        "
+        placeholder="Report"
+        type="text"
+        autofocus
+      /><select
+        class="
+          block
+          rounded-md
+          mr-1
+          px-3
+          w-full
+          text-gray-500
+          py-1
+          bg-gray-800
+          shadow-inner
+          focus:outline-none focus:ring-indigo-600 focus:ring-1
+        "
+        onchange="addReport('select')"
+      >
+        <option value="">Select task</option>
       </select>
-      <input type="text" autofocus />
     </form>
-    <main>
-      <h1></h1>
-      <p></p>
+    <main class="w-full max-w-xl my-8 rounded-md bg-gray-800 overflow-hidden">
+      <h1
+        class="
+          text-xl
+          px-3
+          py-2
+          bg-gray-700 bg-opacity-50
+          border-b border-indigo-500
+        "
+      ></h1>
+      <p class="px-3 pb-5 whitespace-pre-line overflow-y-scroll max-h-96"></p>
     </main>
-    <button onclick="restore()">修復</button>
-    <button onclick="localStorage.clear() & window.location.reload()" >クリア</button>
-    <button name="copy" onclick="copy()" >コピー</button>
-    <button name="copy" onclick="edit(this)" >編集</button>
+    <footer>
+      <button
+        class="font-xs bg-indigo-800 hover:bg-indigo-900 rounded-md px-3 py-1"
+        onclick="restore()"
+      >
+        復元
+      </button>
+      <button
+        class="font-xs bg-red-800 hover:bg-red-900 rounded-md px-3 py-1"
+        onclick="localStorage.clear() & window.location.reload()"
+      >
+        クリア
+      </button>
+      <button
+        class="font-xs bg-green-800 hover:bg-green-900 rounded-md px-3 py-1"
+        name="copy"
+        onclick="copy()"
+      >
+        コピー
+      </button>
+      <button
+        class="font-xs bg-yellow-800 hover:bg-yellow-900 rounded-md px-3 py-1"
+        name="copy"
+        onclick="edit(this)"
+      >
+        編集
+      </button>
+    </footer>
     <!-- <button onclick="copy(title + localStorage.report)" >コピー</button> -->
 
     <script>
       let before = "09.30";
-      const title = new Date().getMonth() + 1 + "/" + new Date().getDate() + "の日報";
-      document.querySelector("h1").innerHTML = title
+      document.querySelector("h1").innerHTML =
+        new Date().getMonth() + 1 + "/" + new Date().getDate() + "の日報";
       let report = "";
 
       const setTime = () =>
-        (new Date().getHours() <= 9 ? "0" : "") +
-        new Date().getHours() +
-        "." +
-        (new Date().getMinutes() <= 9 ? "0" : "") +
-        new Date().getMinutes();
+        new Date().toLocaleTimeString().match(/(\d|:){5}/)[0];
 
-        const showReports = (value) => document.querySelector("p").innerHTML = value ? value.replaceAll(
-          "\n",
-          "<br>"
-        ) : '';
+      const showReports = (value) =>
+        (document.querySelector("p").innerHTML = value ? value : "");
 
       const addReport = (form) => {
         report +=
-          "\n" +
-          before +
-          "〜" +
-          setTime() +
-          "　" +
-          document.querySelector(form).value;
+          `
+          ${before}〜${setTime()}　` + document.querySelector(form).value;
         localStorage.setItem("report", report);
         showReports(report);
 
         before = setTime();
 
         if (parseFloat(before) > 12.3 && parseFloat(before) < 13.3) {
-          before = "13.30"
+          before = "13.30";
         }
-
-        console.log(parseFloat(before));
       };
 
       const setOption = (value) =>
         value
-          .split("\n")
+          .match(/.+/g)
           .forEach(
             (option) =>
-              (document.querySelector("select").innerHTML +=
-                `<option>` + option + "</option>")
+              (document.querySelector(
+                "select"
+              ).innerHTML += `<option>${option}</option>`)
           );
       document.querySelector("form").addEventListener("submit", (event) => {
         event.preventDefault();
@@ -85,37 +155,35 @@
       });
 
       const fixBefore = () => {
-        let reportsArray = document.querySelector('main').innerText.split("\n");
+        let reportsArray = document.querySelector("main").innerText.split("\n");
 
-        before = String(reportsArray[reportsArray.length - 1].slice(6, 11)) ?? before
-      }
-
-      const restore = () => {
-        report = localStorage.report
-        showReports(report)
-        fixBefore()
+        before =
+          String(reportsArray[reportsArray.length - 1].slice(6, 11)) ?? before;
       };
 
-      const copy = () => navigator.clipboard.writeText(document.querySelector('main').innerText)
+      const restore = () => {
+        report = localStorage.report;
+        showReports(report);
+        fixBefore();
+      };
+
+      const copy = () =>
+        navigator.clipboard.writeText(document.querySelector("main").innerText);
 
       let isEditing = false;
-      const edit = element => {
+      const edit = (element) => {
         if (isEditing) {
-          localStorage.setItem('report', document.querySelector('p').innerText);
-          report = document.querySelector('p').innerText;
-          fixBefore()
+          localStorage.setItem("report", document.querySelector("p").innerText);
+          report = document.querySelector("p").innerText;
+          fixBefore();
         }
 
         isEditing = !isEditing;
 
-        element.innerText = isEditing ? "編集完了" : "編集"
+        element.innerText = isEditing ? "編集完了" : "編集";
 
-        document.querySelector('p').contentEditable = isEditing
-
-      }
-
+        document.querySelector("p").contentEditable = isEditing;
+      };
     </script>
   </body>
 </html>
-
-

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新しいタブ</title>
+    <style>
+      
+      * {
+        background-color: #000;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <textarea onchange="setOption(this.value)"></textarea><br>
+      <select onchange="addReport('select')">
+      <option value=""></option>
+      </select>
+      <input type="text" autofocus />
+    </form>
+    <main>
+      <h1></h1>
+      <p></p>
+    </main>
+    <button onclick="restore()">修復</button>
+    <button onclick="localStorage.clear() & window.location.reload()" >クリア</button>
+    <button name="copy" onclick="copy()" >コピー</button>
+    <button name="copy" onclick="edit(this)" >編集</button>
+    <!-- <button onclick="copy(title + localStorage.report)" >コピー</button> -->
+
+    <script>
+      let before = "09.30";
+      const title = new Date().getMonth() + 1 + "/" + new Date().getDate() + "の日報";
+      document.querySelector("h1").innerHTML = title
+      let report = "";
+
+      const setTime = () =>
+        (new Date().getHours() <= 9 ? "0" : "") +
+        new Date().getHours() +
+        "." +
+        (new Date().getMinutes() <= 9 ? "0" : "") +
+        new Date().getMinutes();
+
+        const showReports = (value) => document.querySelector("p").innerHTML = value ? value.replaceAll(
+          "\n",
+          "<br>"
+        ) : '';
+
+      const addReport = (form) => {
+        report +=
+          "\n" +
+          before +
+          "〜" +
+          setTime() +
+          "　" +
+          document.querySelector(form).value;
+        localStorage.setItem("report", report);
+        showReports(report);
+
+        before = setTime();
+
+        if (parseFloat(before) > 12.3 && parseFloat(before) < 13.3) {
+          before = "13.30"
+        }
+
+        console.log(parseFloat(before));
+      };
+
+      const setOption = (value) =>
+        value
+          .split("\n")
+          .forEach(
+            (option) =>
+              (document.querySelector("select").innerHTML +=
+                `<option>` + option + "</option>")
+          );
+      document.querySelector("form").addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        addReport("input");
+      });
+
+      const fixBefore = () => {
+        let reportsArray = document.querySelector('main').innerText.split("\n");
+
+        before = String(reportsArray[reportsArray.length - 1].slice(6, 11)) ?? before
+      }
+
+      const restore = () => {
+        report = localStorage.report
+        showReports(report)
+        fixBefore()
+      };
+
+      const copy = () => navigator.clipboard.writeText(document.querySelector('main').innerText)
+
+      let isEditing = false;
+      const edit = element => {
+        if (isEditing) {
+          localStorage.setItem('report', document.querySelector('p').innerText);
+          report = document.querySelector('p').innerText;
+          fixBefore()
+        }
+
+        isEditing = !isEditing;
+
+        element.innerText = isEditing ? "編集完了" : "編集"
+
+        document.querySelector('p').contentEditable = isEditing
+
+      }
+
+    </script>
+  </body>
+</html>
+
+
